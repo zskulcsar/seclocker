@@ -19,8 +19,8 @@ variable "ssh_key_name" {
   description = "The name of the SSH key to be used with the instance"
 }
 
-variable "ws_log_group_arn" {
-  description = "The ARN for the log group where the instances should send the logs"
+variable "ws_log_instance_profile" {
+  description = "The name for the instance profile to be used with the instance"
 }
 
 # Parameters with sensible defaults
