@@ -1,4 +1,4 @@
 #
-output "ws_log_group_arn" {
-  value = "${aws_cloudwatch_log_group.ws_log.arn}"
+output "ws_log_instance_profile" {
+  value = "${aws_iam_instance_profile.ws_log.name}"
 }

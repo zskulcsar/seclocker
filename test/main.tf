@@ -34,61 +34,6 @@ module "vpc" {
 # Two linux instances doing nothing ...
 #################################
 
-##############
-# IAM stuff
-#######
-data "aws_iam_policy_document" "role_trust" {
-  statement {
-    actions = ["sts:AssumeRole"]
-
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"]
-    }
-  }
-}
-
-data "aws_iam_policy_document" "log_agent" {
-  statement {
-    actions = [
-      "logs:DescribeLogGroups",
-      "logs:DescribeLogStreams",
-    ]
-    resources = ["arn:aws:logs:*:*:*"]
-  }
-
-  statement {
-    actions = [
-      "logs:PutLogEvents",
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream"
-    ]
-    resources = [
-      "${var.ws_log_group_arn}",
-    ]
-  }
-}
-
-resource "aws_iam_role" "ws_role" {
-  name               = "ws-role"
-  assume_role_policy = "${data.aws_iam_policy_document.role_trust.json}"
-}
-
-resource "aws_iam_policy" "cw_logs" {
-  name   = "cw_logs_policy"
-  policy = "${data.aws_iam_policy_document.log_agent.json}"
-}
-
-resource "aws_iam_role_policy_attachment" "default" {
-  role       = "${aws_iam_role.ws_role.name}"
-  policy_arn = "${aws_iam_policy.cw_logs.arn}"
-}
-
-resource "aws_iam_instance_profile" "ws_log" {
-  name = "ws_log_instance_profile"
-  role = "${aws_iam_role.ws_role.name}"
-}
-
 ####################
 # Instance config
 ############
@@ -153,7 +98,7 @@ resource "aws_instance" "ws" {
   vpc_security_group_ids = ["${aws_security_group.sshaccess.id}"]
   associate_public_ip_address = true
   key_name = "${var.ssh_key_name}"
-  iam_instance_profile = "${aws_iam_instance_profile.ws_log.name}"
+  iam_instance_profile = "${var.ws_log_instance_profile}"
 
   user_data = "${data.template_cloudinit_config.config.rendered}"
 
