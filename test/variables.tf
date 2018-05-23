@@ -13,6 +13,7 @@ variable "owner_email" {
 
 variable "ssh_ingress_cidr" {
   description = "The ingress cidr for the SSH access"
+  type = "list"
 }
 
 variable "ssh_key_name" {
